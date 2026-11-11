@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Prompts de Exhibidores</title>
+<style>
+/* Equivalente al marco del artefacto publicado */
+html { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+<style>
+/* Layout: plantilla de dashboard Febeca. Barra lateral 236px con logotipo y navegación por pasos; barra superior 64px; contenido en dos columnas (formulario y prompts). Una sola apariencia clara, según el sistema de diseño. */
+:root {
+  --white: #ffffff; --gray-50: #f9fafb; --gray-100: #eeeeee; --gray-200: #e2e2e2; --gray-300: #c6c6c6;
+  --gray-500: #8a8a8a; --gray-600: #666666; --gray-800: #2b2b2b; --black: #000000;
+  --cyan-50: #f0f9fd; --cyan-200: #bfe7f8; --cyan-400: #4dbbeb; --cyan-500: #009ee3; --cyan-600: #0082ba; --cyan-700: #006591;
+  --status-regular: #f57f17;
+  --font: Arial, Helvetica, sans-serif;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, .08);
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--gray-50); color: var(--black); }
+body { font: 400 14px/1.5 var(--font); }
+a { color: var(--cyan-700); }
+.app { display: flex; flex-wrap: wrap; min-height: 100%; }
+
+/* Barra lateral */
+.side { flex: 1 1 236px; max-width: 236px; min-width: 200px; background: var(--white); border-right: 1px solid var(--gray-200);
+  padding-block: 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px;
+  display: flex; flex-direction: column; gap: 24px; position: sticky; top: 0; align-self: flex-start; height: 100vh; }
+.side .logo { height: 24px; width: auto; object-fit: contain; display: block; align-self: flex-start; }
+.nav { display: grid; gap: 4px; }
+.nav a { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-radius: var(--radius); color: var(--black); text-decoration: none; font-size: 14px; }
+.nav a:hover { background: var(--cyan-50); }
+.nav a.active { background: var(--cyan-500); color: var(--white); font-weight: 600; }
+.nav a .k { font-size: 12px; color: var(--gray-500); min-width: 14px; }
+.nav a.active .k { color: var(--white); }
+.side-foot { margin-top: auto; border-top: 1px solid var(--gray-200); padding-top: 16px; font-size: 12px; color: var(--gray-600); }
+
+/* Principal */
+.main { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; }
+.top { height: 64px; background: var(--white); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 16px;
+  padding-left: 32px; padding-right: max(32px, env(safe-area-inset-right, 0px)); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; }
+.top h1 { margin: 0; font-size: 22px; font-weight: 700; line-height: 1.25; }
+.top .actions { margin-left: auto; display: flex; gap: 8px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--white); }
+.content { padding-block: 32px; padding-left: 32px; padding-right: max(32px, env(safe-area-inset-right, 0px));
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 1180px) { .content { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 820px) {
+  .side { max-width: none; flex-basis: 100%; height: auto; position: static; border-right: 0; border-bottom: 1px solid var(--gray-200);
+    padding-right: max(16px, env(safe-area-inset-right, 0px)); gap: 16px; }
+  .nav { grid-auto-flow: column; grid-auto-columns: max-content; overflow-x: auto; }
+  .side-foot { display: none; }
+  .top, .content { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .top h1 { font-size: 18px; }
+}
+.col { display: grid; gap: 16px; min-width: 0; }
+
+/* Tarjetas */
+.card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; display: grid; gap: 12px; min-width: 0; scroll-margin-top: 80px; }
+.card-h { display: grid; gap: 2px; }
+.card-h .step { font-size: 12px; color: var(--gray-500); font-weight: 600; }
+.card-h h2 { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.25; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.card-h .opt { font-size: 12px; font-weight: 400; color: var(--gray-600); }
+.hint { margin: 0; font-size: 14px; color: var(--gray-600); }
+
+/* Campos */
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.grid4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
+.f { display: grid; gap: 4px; min-width: 0; }
+label, .lbl { font-size: 12px; color: var(--gray-600); font-weight: 600; }
+input[type=text], input[type=number], select, textarea {
+  width: 100%; font: 400 14px/1.4 var(--font); color: var(--black); background: var(--white);
+  border: 1px solid var(--gray-300); border-radius: var(--radius); padding: 8px 12px; min-height: 36px;
+}
+textarea { resize: vertical; min-height: 64px; }
+textarea.big { min-height: 168px; }
+input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible {
+  outline: none; border-color: var(--cyan-400); box-shadow: 0 0 0 3px rgba(0, 158, 227, .28);
+}
+.choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; }
+.choice { position: relative; }
+.choice input { position: absolute; opacity: 0; inset: 0; }
+.choice span { display: block; height: 100%; border: 1px solid var(--gray-300); border-radius: var(--radius); padding: 12px; background: var(--white); cursor: pointer; font-weight: 600; font-size: 14px; }
+.choice span small { display: block; font-weight: 400; color: var(--gray-600); font-size: 12px; margin-top: 2px; }
+.choice input:checked + span { border-color: var(--cyan-500); background: var(--cyan-50); color: var(--cyan-700); }
+.choice input:focus-visible + span { box-shadow: 0 0 0 3px rgba(0, 158, 227, .28); }
+.check { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--black); font-weight: 400; }
+.check input { width: 16px; height: 16px; accent-color: var(--cyan-500); }
+.calc { font-size: 12px; color: var(--gray-600); font-variant-numeric: tabular-nums; }
+.calc b { color: var(--black); font-weight: 600; }
+.calc .warn { color: var(--status-regular); font-weight: 600; }
+.modules { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; }
+.modules textarea { min-height: 56px; }
+
+/* Botones */
+.btn { font: 600 14px var(--font); border-radius: var(--radius); border: 1px solid var(--gray-300); background: var(--white); color: var(--black); padding: 8px 16px; cursor: pointer; white-space: nowrap; }
+.btn:hover { border-color: var(--cyan-500); color: var(--cyan-700); }
+.btn.primary { background: var(--cyan-500); color: var(--white); border-color: var(--cyan-500); }
+.btn.primary:hover { background: var(--cyan-600); border-color: var(--cyan-600); color: var(--white); }
+.btn.sm { font-size: 12px; padding: 6px 12px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* Salida */
+.out { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 80px); }
+@media (max-width: 1180px) { .out { position: static; } }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--gray-200); overflow-x: auto; }
+.tab { font: 600 14px var(--font); background: none; border: 0; border-bottom: 2px solid transparent; color: var(--gray-600); padding: 8px 12px; cursor: pointer; white-space: nowrap; }
+.tab:hover { color: var(--cyan-700); }
+.tab[aria-selected="true"] { color: var(--cyan-700); border-bottom-color: var(--cyan-500); }
+#panel { display: grid; gap: 12px; }
+.tag { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; font-weight: 600; color: var(--gray-600); }
+.attach { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; }
+.attach li { display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 12px; padding: 8px 12px; font-size: 14px; border-bottom: 1px solid var(--gray-200); }
+.attach li:last-child { border-bottom: 0; }
+.attach li b { font-weight: 600; color: var(--cyan-700); font-variant-numeric: tabular-nums; }
+.prompt pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: 400 14px/1.5 var(--font); background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 16px; max-height: 52vh; overflow: auto; }
+.step-h { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.step-h h3 { margin: 0; font-size: 16px; font-weight: 600; }
+.note { font-size: 14px; background: var(--cyan-50); color: var(--black); border: 1px solid var(--cyan-200); border-radius: var(--radius); padding: 12px; }
+.fixes { display: grid; gap: 8px; }
+.fix { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 8px 8px 8px 12px; font-size: 14px; }
+.example { font-size: 14px; background: var(--gray-100); border-radius: var(--radius); padding: 12px; color: var(--black); }
+.toast { position: fixed; left: 50%; bottom: calc(env(safe-area-inset-bottom, 0px) + 24px); transform: translateX(-50%); background: var(--gray-800); color: var(--white); padding: 8px 16px; border-radius: var(--radius); font-size: 14px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 20; }
+.toast.on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .toast { transition: none; } html { scroll-behavior: auto; } }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side" aria-label="Navegación">
+    <img class="logo" src="img/logotipo.png" alt="Febeca">
+    <nav class="nav" id="nav">
+      <a href="#s-marca" class="active"><span class="k">1</span>Marca</a>
+      <a href="#s-tipo"><span class="k">2</span>Tipo de propuesta</a>
+      <a href="#secSpace"><span class="k">3</span>Foto del lugar</a>
+      <a href="#s-exhibidor"><span class="k">4</span>Exhibidor</a>
+      <a href="#s-arte"><span class="k">5</span>Arte publicitario</a>
+      <a href="#s-productos"><span class="k">6</span>Productos</a>
+      <a href="#s-espera"><span class="k">7</span>Lo que espera</a>
+      <a href="#s-prompts"><span class="k">→</span>Prompts</a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <header class="top">
+      <h1>Prompts de exhibidores</h1>
+      <div class="actions"><button type="button" class="btn" id="resetBtn">Vaciar formulario</button></div>
+    </header>
+
+    <main class="content">
+      <form class="col" id="form" autocomplete="off">
+        <section class="card" id="s-marca">
+          <div class="card-h"><span class="step">Paso 1</span><h2>Marca</h2></div>
+          <div class="grid2">
+            <div class="f"><label for="brand">Marca del exhibidor</label>
+              <select id="brand">
+                <option value="">Seleccione una marca</option>
+                <option value="emtop">Emtop</option>
+                <option value="bosch">Bosch</option>
+                <option value="otra">Otra marca</option>
+              </select></div>
+            <div class="f" id="otherBrandWrap" hidden><label for="otherBrand">Nombre de la marca</label><input type="text" id="otherBrand"></div>
+          </div>
+        </section>
+
+        <section class="card" id="s-tipo">
+          <div class="card-h"><span class="step">Paso 2</span><h2>Tipo de propuesta</h2></div>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="mode" value="espacio" checked><span>En el local del cliente<small>Se edita la foto real del lugar</small></span></label>
+            <label class="choice"><input type="radio" name="mode" value="estudio"><span>Estudio, fondo blanco<small>Exhibidor solo, vista 3/4, vertical 9:16</small></span></label>
+          </div>
+        </section>
+
+        <section class="card" id="secSpace">
+          <div class="card-h"><span class="step">Paso 3</span><h2>Foto del lugar</h2></div>
+          <p class="hint">Tome la foto de frente a la pared, a la altura de los ojos, con la pared completa y algo de techo y piso a la vista.</p>
+          <div class="grid4">
+            <div class="f"><label for="spaceW">Ancho libre para exhibidores (m)</label><input type="number" id="spaceW" step="0.1" min="0"></div>
+            <div class="f"><label for="ceilingH">Alto hasta el techo (m)</label><input type="number" id="ceilingH" step="0.1" min="0"></div>
+          </div>
+          <div class="f"><label for="location">Ubicación de los exhibidores</label><input type="text" id="location" placeholder="pared del fondo, a la derecha de la puerta negra"></div>
+          <div class="f"><label for="obstacles">Elementos fijos de la pared que deben quedar visibles</label><input type="text" id="obstacles" placeholder="puerta del depósito, abertura del mezzanine, ventanal a la derecha"></div>
+          <p class="hint">Los exhibidores se reparten en los tramos libres alrededor de estos elementos. El ancho libre se mide sin contar puertas ni aberturas. Si los exhibidores van a tapar algo, indíquelo en «Lo que espera».</p>
+          <div class="lbl">Limpieza del espacio</div>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="clean" value="conservar"><span>Conservar el entorno<small>Solo se agrega lo nuevo</small></span></label>
+            <label class="choice"><input type="radio" name="clean" value="zona"><span>Limpiar la zona<small>Se retira lo que hay donde va el exhibidor</small></span></label>
+            <label class="choice"><input type="radio" name="clean" value="limpia" checked><span>Propuesta limpia<small>Queda solo la arquitectura del local</small></span></label>
+          </div>
+          <div class="grid2">
+            <div class="f"><label for="keepItems">Conservar sí o sí</label><input type="text" id="keepItems" placeholder="la puerta negra, el techo de láminas"></div>
+            <div class="f"><label for="removeItems">Retirar además</label><input type="text" id="removeItems" placeholder="toldo verde, tanques, carteles"></div>
+          </div>
+        </section>
+
+
+        <section class="card" id="s-exhibidor">
+          <div class="card-h"><span class="step">Paso 4</span><h2>Exhibidor</h2></div>
+          <label class="check"><input type="checkbox" id="hasEx" checked> Voy a adjuntar una foto del exhibidor</label>
+          <div class="f"><label for="exDesc">Descripción del exhibidor</label><input type="text" id="exDesc"></div>
+          <p class="hint">El exhibidor se copia de la foto de referencia. Si no adjunta foto, se usa esta descripción.</p>
+          <div class="lbl">¿Sabe cuántos módulos van?</div>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="modKnown" value="si" checked><span>Sí<small>Indicaré la cantidad</small></span></label>
+            <label class="choice"><input type="radio" name="modKnown" value="no"><span>No<small>Calcular con el ancho disponible</small></span></label>
+          </div>
+          <div class="grid4">
+            <div class="f" id="modulesWrap"><label for="modules">Cantidad de módulos</label><input type="number" id="modules" min="1" max="12"></div>
+            <div class="f"><label for="modW">Ancho por módulo (mm)</label><input type="number" id="modW" min="100"></div>
+            <div class="f"><label for="modH">Alto (mm)</label><input type="number" id="modH" min="300"></div>
+            <div class="f"><label for="modD">Profundidad (mm)</label><input type="number" id="modD" min="50"></div>
+          </div>
+          <div class="calc" id="calc"></div>
+          <div class="f"><label for="layout">Disposición</label>
+            <select id="layout">
+              <option value="linea">En línea</option>
+              <option value="L">En L (esquina)</option>
+              <option value="isla">Isla o doble cara</option>
+            </select></div>
+        </section>
+
+        <section class="card" id="s-arte">
+          <div class="card-h"><span class="step">Paso 5</span><h2>Arte publicitario</h2></div>
+          <div class="lbl">¿La propuesta incluye arte publicitario?</div>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="hasArt" value="si"><span>Sí<small>Gráfica de la marca sobre los exhibidores</small></span></label>
+            <label class="choice"><input type="radio" name="hasArt" value="no" checked><span>No<small>Solo exhibidores y productos</small></span></label>
+          </div>
+          <div id="artOptions" class="col" style="gap:12px">
+            <div class="f"><label for="art">Tipo de arte</label>
+              <select id="art">
+                <option value="techo">Gran arte del tope de los exhibidores al techo, del ancho de los exhibidores</option>
+                <option value="pared">Gran arte a todo el ancho de la pared, sobre los exhibidores</option>
+                <option value="cenefa">Cenefa de 40 cm sobre los copetes</option>
+                <option value="otro">Otro</option>
+              </select></div>
+            <div class="f" id="artOtherWrap" hidden><label for="artOther">Describa el tipo de arte</label>
+              <textarea id="artOther" placeholder="Ej. dos banners verticales de 1 m x 3 m a los lados de los exhibidores, con productos y logo"></textarea></div>
+            <div class="f"><label for="heroProducts">Productos protagonistas del arte</label><input type="text" id="heroProducts"></div>
+            <div class="f"><label for="artText">Texto del arte (opcional; si queda vacío, solo va el logo)</label><input type="text" id="artText" placeholder="Distribuidor autorizado"></div>
+          </div>
+        </section>
+
+        <section class="card" id="s-productos">
+          <div class="card-h"><span class="step">Paso 6</span><h2>Productos</h2></div>
+          <div class="f"><label for="products">Descripción de los productos a exhibir</label>
+            <textarea id="products" placeholder="Ej. taladros inalámbricos como protagonistas, esmeriladoras, rotomartillos, juegos de llaves y accesorios en blíster; maletines en la base"></textarea></div>
+          <div class="lbl">¿Se colocará el logo de la marca?</div>
+          <div class="choices">
+            <label class="choice"><input type="radio" name="hasLogo" value="si" checked><span>Sí<small>Adjuntaré el logo; va en el copete de cada módulo</small></span></label>
+            <label class="choice"><input type="radio" name="hasLogo" value="no"><span>No<small>Exhibidores sin logo</small></span></label>
+          </div>
+        </section>
+
+        <section class="card" id="s-espera">
+          <div class="card-h"><span class="step">Paso 7</span><h2>Lo que espera</h2></div>
+          <p class="hint">Esta descripción tiene prioridad en el prompt. Explique la estrategia: qué debe destacar y qué debe percibir el cliente al ver la propuesta.</p>
+          <div class="row"><button type="button" class="btn sm" id="guideBtn">Insertar guía de preguntas</button></div>
+          <textarea id="description" class="big" maxlength="4000" aria-label="Descripción detallada"></textarea>
+          <div class="f"><label for="avoid">Evitar</label><input type="text" id="avoid" placeholder="mostrar precios, tapar la puerta del depósito"></div>
+          <div class="f"><label for="aspect">Formato de la imagen</label>
+            <select id="aspect">
+              <option value="16:9">Horizontal 16:9</option>
+              <option value="4:3">Horizontal 4:3</option>
+              <option value="1:1">Cuadrado 1:1</option>
+              <option value="3:4">Vertical 3:4</option>
+              <option value="9:16">Vertical 9:16</option>
+            </select></div>
+        </section>
+      </form>
+
+      <div class="col out" id="s-prompts">
+        <section class="card" aria-label="Prompts generados">
+          <div id="panel"></div>
+        </section>
+        <section class="card">
+          <div class="card-h"><h2>Correcciones rápidas</h2></div>
+          <p class="hint">Si el primer resultado falla, pegue una de estas frases en el mismo chat en lugar de empezar de nuevo.</p>
+          <div class="fixes" id="fixes"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+
+  var BRANDS = {
+    emtop: { brandName: 'Emtop', colors: 'rojo Emtop y blanco', slogan: 'Making A Difference', exDesc: 'módulo de panel perforado metálico pintado en rojo, con copete superior y zócalo inferior', modW: 905, modH: 2200, modD: 440, heroProducts: 'taladro inalámbrico, esmeriladora angular y rotomartillo Emtop' },
+    bosch: { brandName: 'Bosch', colors: 'azul Bosch y blanco', slogan: '', exDesc: 'módulo de panel perforado en azul con copete superior y base con repisa', modW: 900, modH: 2200, modD: 450, heroProducts: 'taladro percutor, esmeriladora y atornillador inalámbrico Bosch' },
+    otra: { brandName: '', colors: '', slogan: '', exDesc: '', modW: 900, modH: 2200, modD: 440, heroProducts: '' },
+  };
+
+  var GUIDE = 'Objetivo de la propuesta: \nQué debe sentir o entender el cliente al verla: \nProductos que deben destacar y dónde: \nAmbiente del local (luz, pasillos, elementos a respetar): \nElementos de marca extra (cenefas, frases, señalética): \nTipo de tienda y público: \nOtros detalles: ';
+
+  /* ---------- Estado del formulario ---------- */
+  function val(id) { var e = $(id); return e ? String(e.value || '').trim() : ''; }
+  function num(id) { var v = parseFloat($(id).value); return isFinite(v) && v > 0 ? v : 0; }
+  function radio(name) { var e = document.querySelector('input[name="' + name + '"]:checked'); return e ? e.value : ''; }
+  function setRadio(name, v) { var e = document.querySelector('input[name="' + name + '"][value="' + v + '"]'); if (e) e.checked = true; }
+
+  function applyBrand(key, keepCustom) {
+    var b = BRANDS[key] || BRANDS.otra;
+    ['exDesc', 'heroProducts'].forEach(function (k) { if (!keepCustom || !val(k)) $(k).value = b[k]; });
+    ['modW', 'modH', 'modD'].forEach(function (k) { $(k).value = b[k]; });
+  }
+
+  function resetForm() {
+    $('form').reset();
+    update();
+  }
+
+  function read() {
+    var key = val('brand'), preset = BRANDS[key] || BRANDS.otra;
+    var modW = Math.round(num('modW') || 900), spaceW = num('spaceW');
+    var modKnown = radio('modKnown') !== 'no';
+    var modules = modKnown ? Math.round(num('modules')) : (spaceW ? Math.max(1, Math.floor(spaceW * 1000 / modW)) : 0);
+    return {
+      brandKey: key, brandName: key === 'otra' ? (val('otherBrand') || 'la marca') : (preset.brandName || 'la marca'), colors: preset.colors, slogan: preset.slogan,
+      modKnown: modKnown,
+      mode: radio('mode'), clean: radio('clean') || 'conservar',
+      spaceW: num('spaceW'), ceilingH: num('ceilingH'), location: val('location'),
+      obstacles: val('obstacles'), keepItems: val('keepItems'), removeItems: val('removeItems'),
+      hasEx: $('hasEx').checked, exDesc: val('exDesc'),
+      modules: modules, modW: modW, modH: Math.round(num('modH') || 2200), modD: Math.round(num('modD') || 440),
+      layout: val('layout'),
+      hasArt: radio('hasArt') !== 'no', art: val('art'), artOther: val('artOther'), heroProducts: val('heroProducts'), artText: val('artText'),
+      hasLogo: radio('hasLogo') !== 'no', products: val('products'),
+      description: val('description'), avoid: val('avoid'), aspect: val('aspect') || '16:9',
+    };
+  }
+
+  /* ---------- Utilidades de texto ---------- */
+  function m(v) { return (Math.round(v * 100) / 100).toString().replace('.', ','); }
+  function list(items) { items = items.filter(Boolean); if (items.length < 2) return items.join(''); return items.slice(0, -1).join(', ') + ' y ' + items[items.length - 1]; }
+  function descLines(d) {
+    return d.split(/\r?\n/).map(function (l) { return l.replace(/^\s*[-•*]\s*/, '').trim(); }).filter(function (l) { return l && !/:\s*$/.test(l); }).map(function (l) { return /[.!?]$/.test(l) ? l : l + '.'; });
+  }
+  function aspectWords(a) {
+    return { '16:9': 'horizontal 16:9', '4:3': 'horizontal 4:3', '1:1': 'cuadrado 1:1', '3:4': 'vertical 3:4', '9:16': 'vertical 9:16' }[a] || a;
+  }
+  var LAYOUT = { linea: 'uno al lado del otro, en línea recta', L: 'formando una L en la esquina', isla: 'como isla de doble cara, accesible por ambos lados' };
+
+  /** Numeración de imágenes adjuntas. */
+  function images(s, opts) {
+    opts = opts || {};
+    var out = [], k = 1;
+    function add(role, label) { out.push({ role: role, n: k++, label: label }); }
+    if (s.mode === 'espacio' && !opts.skipSpace) add('space', opts.cleaned ? 'foto del local ya limpia, generada en el paso 1 (base a editar)' : 'foto real del local (base a editar)');
+    if (s.hasEx) add('ex', 'foto del exhibidor de referencia');
+    if (s.hasLogo) add('logo', 'logo oficial de ' + s.brandName + ' (reproducir exacto)');
+    return out;
+  }
+  function refs(imgs, role) {
+    var nums = imgs.filter(function (x) { return x.role === role; }).map(function (x) { return x.n; });
+    if (!nums.length) return '';
+    if (nums.length === 1) return 'la Imagen ' + nums[0];
+    if (role === 'prod' && nums.length > 2) return 'las Imágenes ' + nums[0] + ' a ' + nums[nums.length - 1];
+    return 'las Imágenes ' + list(nums.map(String));
+  }
+
+  function tramos(n) {
+    var k = Math.ceil(n / 6), base = Math.floor(n / k), extra = n % k, parts = [];
+    for (var i = 0; i < k; i++) parts.push(base + (i < extra ? 1 : 0));
+    var same = parts.every(function (x) { return x === parts[0]; });
+    return same ? k + ' tramos de ' + parts[0] : parts.map(function (x, i) { return (i ? 'uno de ' : 'un tramo de ') + x; }).join(', ').replace(/, ([^,]*)$/, ' y $1');
+  }
+
+  function derived(s) {
+    var front = s.modules ? s.modules * s.modW / 1000 : 0;
+    var artH = s.ceilingH ? Math.max(0, s.ceilingH - s.modH / 1000) : 0;
+    return { front: front, artH: artH };
+  }
+
+  /* ---------- Bloques compartidos ---------- */
+  function cleanText(s) {
+    var t = {
+      conservar: 'Conserva todo el entorno de la foto tal como está; solo agrega lo que se describe aquí.',
+      zona: 'Retira todo lo que hoy ocupa la zona donde van los exhibidores y el arte' + (s.location ? ' (' + s.location + ')' : '') + '. El resto del local queda igual.',
+      limpia: 'Propuesta limpia: retira todos los productos, exhibidores, carteles, toldos, tanques y objetos sueltos de la foto, incluidos los productos en exhibición apoyados en la pared o el piso (puertas de muestra, máquinas, tanques, cajas). Deja solo la arquitectura del local (paredes, techo, piso, puertas y ventanas) con superficies limpias y continuas.',
+    }[s.clean];
+    var extra = [];
+    if (s.removeItems) extra.push('Retira además: ' + s.removeItems + '.');
+    if (s.keepItems) extra.push('Conserva sí o sí: ' + s.keepItems + '.');
+    return [t].concat(extra);
+  }
+
+  function exhibitorLines(s, imgs, d) {
+    var L = [];
+    var exRef = refs(imgs, 'ex'), logoRef = refs(imgs, 'logo');
+    var dims = s.modW + ' mm de ancho x ' + s.modH + ' mm de alto x ' + s.modD + ' mm de profundidad cada uno';
+    if (s.modules) {
+      L.push(s.modules + ' módulo' + (s.modules > 1 ? 's' : '') + ' ' + (LAYOUT[s.layout] || LAYOUT.linea) + ', de ' + dims + '. Frente total: ' + m(d.front) + ' m.' + (!s.modKnown ? ' Es la cantidad que cabe en el ancho disponible de ' + m(s.spaceW) + ' m.' : ''));
+    } else {
+      L.push('La cantidad de módulos que quepa completa en la zona indicada, ' + (LAYOUT[s.layout] || LAYOUT.linea) + ', sin módulos cortados ni espacios sobrantes, de ' + dims + '.');
+    }
+    if (exRef) {
+      L.push('Cada módulo es igual al exhibidor de ' + exRef + ': misma forma, material, color, acabado, copete, zócalo y sistema de ganchos' + (s.exDesc ? ' (' + s.exDesc + ')' : '') + '.');
+    } else if (s.exDesc) {
+      L.push('Exhibidor: ' + s.exDesc + '.');
+    }
+    if (s.hasLogo) L.push('Copete superior con el logo ' + (logoRef ? 'de ' + logoRef : s.brandName) + ', centrado, grande, legible y sin productos que lo tapen. Reprodúcelo exacto: no cambies sus letras, proporciones ni colores.');
+    else L.push('Sin logos en el exhibidor: el copete queda liso, en el color del exhibidor.');
+    if (s.slogan && s.hasLogo) L.push('Zócalo inferior con la frase "' + s.slogan + '".');
+    if (s.modules !== 1) L.push('Módulos alineados, apoyados en el piso, a la misma altura y sin espacios entre ellos.');
+    if (s.modules >= 6) L.push('Cuenta los módulos: deben verse exactamente ' + s.modules + ' módulos, ni uno más ni uno menos.' + (s.modules > 8 ? ' Para no equivocarte, organízalos en ' + tramos(s.modules) + ' contiguos.' : ''));
+    return L;
+  }
+
+  function artLines(s, imgs, d) {
+    if (!s.hasArt) return [];
+    var width = d.front ? ' (' + m(d.front) + ' m)' : '';
+    var logoRef = refs(imgs, 'logo');
+    var L = [];
+    if (s.art === 'techo') {
+      L.push('Un arte impreso de gran formato ocupa desde el borde superior de los exhibidores hasta el techo' + (d.artH ? ' (aprox. ' + m(d.artH) + ' m de alto)' : '') + ' y tiene exactamente el mismo ancho que la línea de exhibidores' + width + '. Sus bordes laterales quedan alineados con el extremo del primer y del último módulo.');
+    } else if (s.art === 'pared') {
+      L.push('Un arte impreso de gran formato cubre todo el ancho de la pared' + (s.spaceW ? ' (aprox. ' + m(s.spaceW) + ' m)' : '') + ', desde el borde superior de los exhibidores hasta el techo.');
+    } else if (s.art === 'cenefa') {
+      L.push('Una cenefa horizontal de unos 40 cm de alto va justo sobre los copetes, del mismo ancho que la línea de exhibidores' + width + '.');
+    } else {
+      L.push('Tipo de arte: ' + (s.artOther ? s.artOther.replace(/\s*\n\s*/g, ' ').replace(/\.?$/, '.') : 'gráfica publicitaria de la marca integrada con los exhibidores.'));
+    }
+    if (s.art !== 'otro') L.push('Acabado de lona o vinilo impreso, mate, montado plano sobre la pared: sin marco, sin relieve y sin iluminación propia.');
+    L.push('Contenido: ' + (s.hasLogo ? 'el logo ' + (logoRef ? 'de ' + logoRef : s.brandName) + ' en grande' : 'gráfica de la marca ' + s.brandName) + (s.heroProducts ? ' y fotografías de producto de ' + s.heroProducts : '') + ', con fondo en ' + (s.colors || 'los colores de la marca') + '. Composición de publicidad profesional, limpia y con jerarquía clara.');
+    L.push(s.artText ? 'Único texto del arte: "' + s.artText + '". No agregues ningún otro texto.' : (s.hasLogo ? 'Sin textos aparte del logo.' : 'Sin textos.'));
+    return L;
+  }
+
+  function productLines(s) {
+    var L = [];
+    L.push(s.products ? 'Productos a exhibir: ' + s.products.replace(/\s*\n\s*/g, ' ').replace(/\.?$/, '.') : 'Productos reales de la marca ' + s.brandName + '.');
+    L.push('Distribúyelos de forma ordenada: los más importantes en la zona más visible (módulos centrales, a la altura de los ojos) y los productos grandes o en caja en la base.');
+    if (s.modules !== 1) L.push('Cada módulo tiene su propia mezcla de productos; no repitas el mismo módulo copiado.');
+    L.push('Productos colgados en filas horizontales ordenadas, con separación regular entre ganchos y a escala real (un taladro mide unos 20 cm, una esmeriladora unos 30 cm, el módulo ' + m(s.modH / 1000) + ' m).');
+    L.push('Solo productos de ' + s.brandName + '. No inventes productos ni marcas. Los textos de productos y empaques se ven correctos o neutros, nunca con letras deformadas.');
+    return L;
+  }
+
+  function qualityLines(s) {
+    return [
+      'Fotografía profesional de retail con lente equivalente a 24–35 mm, cámara nivelada y verticales rectas.',
+      s.mode === 'espacio' ? 'Luz coherente con la del local: misma dirección, temperatura e intensidad; sombras de contacto suaves en el piso.' : 'Iluminación de estudio suave y difusa, sin sombras duras; solo una sombra de contacto sutil en el piso.',
+      'Colores fieles a la marca y contraste natural. Sin efecto HDR, sin sobresaturación, sin brillos ni destellos exagerados.',
+      'Nitidez uniforme en todo el exhibidor; logos y letras correctos.',
+    ];
+  }
+
+  function avoidLine(s) {
+    return 'Personas, marcas de agua, textos inventados y logos de otras marcas en la zona intervenida' + (s.avoid ? '. También: ' + s.avoid : '') + '.';
+  }
+
+  function block(title, lines) {
+    lines = lines.filter(Boolean);
+    if (!lines.length) return '';
+    return title + '\n' + lines.map(function (l) { return '- ' + l; }).join('\n') + '\n';
+  }
+
+  /* ---------- ChatGPT: estructurado y explícito ---------- */
+  function chatgptPrompt(s, opts) {
+    opts = opts || {};
+    var imgs = images(s, opts), d = derived(s), out = [];
+    var desc = descLines(s.description);
+    if (s.mode === 'espacio') {
+      out.push('Usa la Imagen 1 (' + (opts.cleaned ? 'foto del local ya limpia' : 'foto real del local') + ') como base y crea un render fotorrealista de propuesta comercial. Debe verse como una fotografía profesional tomada en ese mismo lugar, no como un montaje ni una ilustración 3D.\n');
+    } else {
+      out.push('Render 3D publicitario, profesional y fotorrealista, estilo Unreal Engine 5, de un exhibidor comercial de productos (POS display stand) para ' + s.brandName + '.\n');
+    }
+    out.push(block('IMÁGENES ADJUNTAS (en este orden)', imgs.map(function (x) { return 'Imagen ' + x.n + ': ' + x.label + '.'; })));
+    if (desc.length) out.push(block('LO QUE ESPERAMOS (prioritario)', desc.concat(['Si algo de lo que sigue contradice esta descripción, sigue la descripción. Las únicas excepciones: la cámara y la arquitectura del local nunca se modifican, y se mantienen el logo exacto, la escala real y las medidas del exhibidor.'])));
+    if (s.mode === 'espacio') {
+      out.push(block('CÁMARA Y ARQUITECTURA (no negociable)', [
+        'Mantén el mismo punto de vista, encuadre, altura de cámara, lente y perspectiva de la Imagen 1.',
+        'Paredes, techo, piso, columnas, puertas, aberturas y ventanas quedan exactamente donde están, con su forma, tamaño, color y material. No agregues ni quites arquitectura y no cambies el acabado del piso ni del techo.',
+        s.obstacles ? 'Elementos fijos que quedan visibles y accesibles: ' + s.obstacles + '. Los exhibidores se reparten en los tramos libres a su alrededor.' : '',
+        s.location ? 'Ubicación de los exhibidores: ' + s.location + '.' : '',
+        s.spaceW ? 'Ancho disponible aproximado: ' + m(s.spaceW) + ' m.' : '',
+      ]));
+      out.push(opts.cleaned ? '' : block('LIMPIEZA DEL ESPACIO', cleanText(s)));
+    }
+    out.push(block('EXHIBIDORES', exhibitorLines(s, imgs, d)));
+    out.push(block('ARTE PUBLICITARIO', artLines(s, imgs, d)));
+    out.push(block('PRODUCTOS', productLines(s)));
+    if (s.mode === 'estudio') {
+      out.push(block('TOMA Y PRESENTACIÓN', [
+        'Fondo blanco puro, uniforme e infinito, de estudio comercial.',
+        'Cámara en perspectiva de tres cuartos (45 grados), mostrando frente y lateral para destacar volumen, profundidad y grosor de los materiales.',
+        'Paleta de máximo 2 colores sólidos: ' + (s.colors || 'los colores del logo') + '. Sin degradados ni efectos complejos.',
+      ]));
+    }
+    out.push(block('CALIDAD FOTOGRÁFICA', qualityLines(s)));
+    out.push(block('EVITAR', [avoidLine(s)]));
+    out.push(block('FORMATO', ['Imagen ' + aspectWords(s.mode === 'estudio' && s.aspect === '16:9' ? '9:16' : s.aspect) + '.']));
+    return out.filter(Boolean).join('\n').trim();
+  }
+
+  /* ---------- Correcciones ---------- */
+  function fixes(s) {
+    var imgs = images(s);
+    var logoRef = refs(imgs, 'logo') || 'la imagen del logo';
+    var d = derived(s);
+    return [
+      'Cambiaste el espacio. Vuelve a la foto base: mismo ángulo de cámara, mismas paredes, puertas, aberturas, techo y piso, con sus materiales. Solo cambia la zona de los exhibidores y el arte.',
+      s.modules ? 'La cantidad de módulos no es correcta. Deben verse exactamente ' + s.modules + ' módulos' + (s.modules > 8 ? ', en ' + tramos(s.modules) : '') + '.' : '',
+      s.hasLogo ? 'El logo quedó deformado. Usa exactamente el logo de ' + logoRef + ', sin cambiar letras, proporciones ni colores.' : '',
+      'Los productos no están a escala. Un taladro mide unos 20 cm y cada módulo mide ' + m(s.modH / 1000) + ' m de alto; ajústalos a escala real.',
+      'Los módulos se ven copiados. Cambia la mezcla de productos de cada módulo, manteniendo el orden y las filas.',
+      s.hasArt ? 'El arte publicitario no quedó como se pidió. ' + artLines(s, imgs, d)[0] : '',
+      'Se ve artificial. Baja la saturación y el contraste, quita el efecto HDR y los brillos: que parezca una foto real del local.',
+    ].filter(Boolean);
+  }
+
+  /* ---------- Render ---------- */
+
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function attachList(items) {
+    if (!items.length) return '<p class="hint">No hay imágenes que adjuntar.</p>';
+    return '<ol class="attach">' + items.map(function (x) { return '<li><b>Imagen ' + x.n + '</b><span>' + esc(x.label) + '</span></li>'; }).join('') + '</ol>';
+  }
+
+  var texts = {};
+  function promptBlock(key, title, text, attach) {
+    texts[key] = text;
+    return '<div class="step-h"><h3>' + esc(title) + '</h3><button type="button" class="btn primary" data-copy="' + key + '">Copiar prompt</button></div>' +
+      (attach ? '<div class="tag">Adjunte en este orden</div>' + attachList(attach) : '') +
+      '<div class="prompt"><pre id="pre-' + key + '">' + esc(text) + '</pre></div>';
+  }
+
+  function update() {
+    var s = read(), d = derived(s);
+    $('secSpace').hidden = s.mode !== 'espacio';
+    $('otherBrandWrap').hidden = s.brandKey !== 'otra';
+    $('modulesWrap').hidden = !s.modKnown;
+    $('artOptions').hidden = !s.hasArt;
+    $('artOtherWrap').hidden = s.art !== 'otro';
+    var calc;
+    if (s.modules) calc = (s.modKnown ? '' : 'Caben <b>' + s.modules + ' módulos</b> en ' + m(s.spaceW) + ' m · ') + 'Frente total <b>' + m(d.front) + ' m</b>';
+    else calc = s.mode === 'espacio' ? 'Indique el ancho libre en el paso 3 para calcular los módulos. Si lo deja vacío, ChatGPT usará los que quepan en la zona indicada.' : 'Sin cantidad definida: ChatGPT mostrará la cantidad que quepa en la composición.';
+    if (s.spaceW && d.front > s.spaceW) calc += ' · <span class="warn">supera el ancho disponible (' + m(s.spaceW) + ' m)</span>';
+    if (d.artH) calc += ' · arte hasta el techo <b>' + m(d.artH) + ' m</b> de alto';
+    if (s.modules > 8) calc += ' · <span class="warn">con más de 8 módulos ChatGPT suele equivocarse en la cantidad; revise el conteo</span>';
+    $('calc').innerHTML = calc;
+
+    texts = {};
+    $('panel').innerHTML = '<div class="note">Abra un chat nuevo en ChatGPT, pegue el prompt y adjunte las imágenes en el mismo mensaje.</div>' +
+      promptBlock('chatgpt', 'Prompt para ChatGPT', chatgptPrompt(s), images(s));
+
+    $('fixes').innerHTML = fixes(s).map(function (t, i) {
+      texts['fix' + i] = t;
+      return '<div class="fix"><span>' + esc(t) + '</span><button type="button" class="btn" data-copy="fix' + i + '">Copiar</button></div>';
+    }).join('');
+
+  }
+
+  /* ---------- Copiar ---------- */
+  var toastTimer;
+  function toast(msg) { var t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('on'); }, 1800); }
+  function selectText(key) {
+    var el = $('pre-' + key);
+    if (!el) return;
+    var r = document.createRange(); r.selectNodeContents(el);
+    var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-copy]');
+    if (!b) return;
+    var key = b.getAttribute('data-copy'), text = texts[key] || '';
+    var done = function () { toast('Copiado'); };
+    var fail = function () { selectText(key); toast('Texto seleccionado. Cópielo con Ctrl+C'); };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fail);
+      else fail();
+    } catch (err) { fail(); }
+  });
+
+  /* ---------- Eventos ---------- */
+  $('brand').addEventListener('change', function () { applyBrand(this.value); update(); });
+  $('form').addEventListener('input', update);
+  $('form').addEventListener('change', function (e) {
+    if (e.target.name === 'mode') $('aspect').value = e.target.value === 'estudio' ? '9:16' : '16:9';
+    update();
+  });
+  $('form').addEventListener('submit', function (e) { e.preventDefault(); });
+  $('resetBtn').addEventListener('click', resetForm);
+  $('guideBtn').addEventListener('click', function () {
+    var t = $('description'); t.value = t.value.trim() ? t.value.trim() + '\n\n' + GUIDE : GUIDE; t.focus(); update();
+  });
+
+  update();
+})();
+</script>
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('#nav a'));
+  function setActive(id) { links.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + id); }); }
+  if (!('IntersectionObserver' in window)) return;
+  var obs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) { if (e.isIntersecting) setActive(e.target.id); });
+  }, { rootMargin: '-90px 0px -60% 0px' });
+  links.forEach(function (a) { var t = document.querySelector(a.getAttribute('href')); if (t) obs.observe(t); });
+})();
+</script>
+</body>
+</html>
