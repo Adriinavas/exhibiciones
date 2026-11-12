@@ -136,7 +136,7 @@ html { scroll-behavior: smooth; }
 <body>
 <div class="app">
   <aside class="side" aria-label="Navegación">
-    <img class="logo" src="img/logotipo.png" alt="Febeca">
+    <img class="logo" src="logotipo.png" alt="Febeca">
     <nav class="nav" id="nav">
       <a href="#s-marca" class="active"><span class="k">1</span>Marca</a>
       <a href="#s-tipo"><span class="k">2</span>Tipo de propuesta</a>
@@ -599,18 +599,39 @@ html { scroll-behavior: smooth; }
     var t = $('description'); t.value = t.value.trim() ? t.value.trim() + '\n\n' + GUIDE : GUIDE; t.focus(); update();
   });
 
-  update();
+  /* Siempre arrancar vacío y al inicio (sin restaurar valores ni posición del navegador) */
+  function startFresh() {
+    $('form').reset();
+    update();
+    try { if (location.hash) history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* sin historial */ }
+    window.scrollTo(0, 0);
+  }
+  try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) { /* sin historial */ }
+  startFresh();
+  window.addEventListener('pageshow', function (e) { if (e.persisted) startFresh(); });
 })();
 </script>
 <script>
 (function () {
   var links = Array.prototype.slice.call(document.querySelectorAll('#nav a'));
   function setActive(id) { links.forEach(function (a) { a.classList.toggle('active', a.getAttribute('href') === '#' + id); }); }
-  if (!('IntersectionObserver' in window)) return;
-  var obs = new IntersectionObserver(function (entries) {
-    entries.forEach(function (e) { if (e.isIntersecting) setActive(e.target.id); });
-  }, { rootMargin: '-90px 0px -60% 0px' });
-  links.forEach(function (a) { var t = document.querySelector(a.getAttribute('href')); if (t) obs.observe(t); });
+  var sections = links.map(function (a) { return document.querySelector(a.getAttribute('href')); }).filter(function (t) { return t && t.id !== 's-prompts'; });
+  function onScroll() {
+    var current = sections[0];
+    sections.forEach(function (t) { if (!t.hidden && t.getBoundingClientRect().top <= 120) current = t; });
+    if (current) setActive(current.id);
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+  links.forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var t = document.querySelector(a.getAttribute('href'));
+      if (!t) return;
+      e.preventDefault();
+      t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setActive(t.id);
+    });
+  });
 })();
 </script>
 </body>
